@@ -2,6 +2,13 @@ defmodule Todo.Cache do
   use GenServer
   import String, only: [to_atom: 1]
 
+  @doc """
+  Returns all items in the ETS table named after Todo.Cache
+  """
+  def get_lists do
+    :ets.tab2list(__MODULE__)
+  end
+
   def save(list) do
     :ets.insert(__MODULE__, {to_atom(list.name), list})
   end

@@ -1,11 +1,12 @@
 defmodule Todo.ServerTest do
   use ExUnit.Case
 
+  alias Todo.Cache
   alias Todo.Server
 
   setup do
     on_exit fn ->
-      Enum.each Server.lists, fn(list) ->
+      Enum.each Server.get_lists, fn(list) ->
         Server.delete_list(list)
       end
     end
@@ -35,5 +36,13 @@ defmodule Todo.ServerTest do
     counts = Supervisor.count_children(Server)
 
     assert counts.active == 0
+  end
+
+  test "Server should maintain its existing state on restarts" do
+    Server.add_list("home")
+    Server.add_list("school")
+
+    Supervisor.restart_child(Todo.Supervisor, Server)
+    assert Supervisor.count_children(Server).active == 2
   end
 end
